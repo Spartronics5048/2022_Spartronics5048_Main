@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems;
 
-
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -32,15 +30,49 @@ public class DriveSubsystem extends SubsystemBase {
     lf_drive.restoreFactoryDefaults();
     lr_drive.restoreFactoryDefaults();
 
+    //Left Drive train is inverted
+    lf_drive.setInverted(true);
+    lr_drive.setInverted(true);
+
+    //Rear motors are set to follow forward motors
     rr_drive.follow(rf_drive);
     lr_drive.follow(lf_drive);
   }
 
-  public void tankDrive(double turnPower, double forwardPower) {
-   
-    double rightPower = forwardPower + turnPower;
-    double leftPower = forwardPower - turnPower;
-
+//the code that dictates how controller values become motor values
+public void tankDrive(double forwardPower, double turnPower) {
+	//new code:
+	
+	/* we want to be able to have it so that either stick can affect the
+	robots movement without them both needing to be above dead band, so we need
+	to split up the statements from the old implementation into step 1, applying forward power
+	step 2, applying turning power. We can then place the sections into if statements to see
+	if the values of the controllers are above deadband before applying their value to the right 
+	and left power. We could define the dead band values here in the code, but to be clean they
+	should be defined in the file Constants.java, which I believe I did correctly*/
+	
+	double rightPower = 0;
+  double leftPower = 0;
+	
+	//if forwardPower is greater than deadband OR forwardPower is less than deadband
+	if(forwardPower > Constants.forwardDeadBand || (Constants.forwardDeadBand * -1) > forwardPower){
+		//True, set input to power
+		rightPower = forwardPower;
+		leftPower = forwardPower;
+	}
+	//else do nothing
+	
+	//if turnPower is greater than deadband OR turnPower is less than deadband
+	if(turnPower > Constants.turnDeadBand || (Constants.turnDeadBand * -1) > turnPower){
+		//take the current values of the motors and add the turn value to them, and then set that as the new values
+		//we could have done this with forward power too, but since the value is just 0 to start always, there is no point
+		//in taking the current value of the motors.
+		rightPower = rightPower + turnPower;
+		leftPower = leftPower - turnPower;
+	}
+  //else do nothing
+	
+	//forward the values on to the motors
     rf_drive.set(rightPower);
     lf_drive.set(leftPower);
   }
@@ -48,12 +80,6 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    
-    //Pull Buss Voltage for each drive motor
-    double rf_Voltage = rf_drive.getBusVoltage();
-    double rr_Voltage = rr_drive.getBusVoltage();
-    double lf_Voltage = lf_drive.getBusVoltage();
-    double lr_Voltage = lr_drive.getBusVoltage();
 
     //Pull Current for each drive motor
     double rf_current = rf_drive.getOutputCurrent();
@@ -67,15 +93,9 @@ public class DriveSubsystem extends SubsystemBase {
     double lf_appliedOut = lf_drive.getAppliedOutput();
     double lr_appliedOut = lr_drive.getAppliedOutput();
 
-    /////////////////////////////////
+    ////////////////////////////////
 
     // Open SmartDashboard when your program is running to see the values
-
-    //Print Buss Voltage of each drive motor to Smart Dashboard
-    SmartDashboard.putNumber("Right Front Bus Voltage", rf_Voltage);
-    SmartDashboard.putNumber("Right Rear  Bus Voltage", rr_Voltage);
-    SmartDashboard.putNumber("Left  Front Bus Voltage", lf_Voltage);
-    SmartDashboard.putNumber("Left  Rear  Bus Voltage", lr_Voltage);
 
     //Print Current of each drive motor to Smart Dashboard
     SmartDashboard.putNumber("Right Front Current", rf_current);
@@ -88,5 +108,6 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Right Rear  Applied Output", rr_appliedOut);
     SmartDashboard.putNumber("Left  Front Applied Output", lf_appliedOut);
     SmartDashboard.putNumber("Left  Rear  Applied Output", lr_appliedOut);
+
   }
 }

@@ -4,9 +4,14 @@
 
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.CvSink;
+import edu.wpi.first.cscore.CvSource;
+import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import org.opencv.core.Mat;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -16,9 +21,12 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
+  private Command disabledCommand;
 
   private RobotContainer m_robotContainer;
 
+  Thread m_visionThread;
+  
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -28,6 +36,42 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+    m_visionThread =
+    new Thread(
+        () -> {
+          // Get the UsbCamera from CameraServer
+          UsbCamera camera = CameraServer.startAutomaticCapture();
+          // Set the resolution
+          camera.setResolution(426, 240);
+
+
+
+          // Get a CvSink. This will capture Mats from the camera
+          CvSink cvSink = CameraServer.getVideo();
+          // Setup a CvSource. This will send images back to the Dashboard
+          CvSource outputStream = CameraServer.putVideo("Rectangle", 1, 1);
+
+          // Mats are very memory expensive. Lets reuse this Mat.
+          Mat mat = new Mat();
+
+          // This cannot be 'true'. The program will never exit if it is. This
+          // lets the robot stop this thread when restarting robot code or
+          // deploying.
+          while (!Thread.interrupted()) {
+            // Tell the CvSink to grab a frame from the camera and put it
+            // in the source mat.  If there is an error notify the output.
+            if (cvSink.grabFrame(mat) == 0) {
+              // Send the output the error.
+              outputStream.notifyError(cvSink.getError());
+              // skip the rest of the current iteration
+              continue;
+            }
+            // Give the output stream a new image to display
+            outputStream.putFrame(mat);
+          }
+        });
+      m_visionThread.setDaemon(true);
+      m_visionThread.start();
   }
 
   /**
@@ -44,11 +88,15 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-  }
+   
+    }
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    disabledCommand = m_robotContainer.getDisabledCommand();
+    disabledCommand.schedule();
+  }
 
   @Override
   public void disabledPeriodic() {}
@@ -77,6 +125,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
   }
 
   /** This function is called periodically during operator control. */

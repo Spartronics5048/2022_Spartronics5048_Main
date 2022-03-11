@@ -4,20 +4,19 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.ArmSubsystem;
 
-public class DriveCommand extends CommandBase {
-  public final DriveSubsystem m_Subsystem;
-  public final XboxController m_driveController;
+public class ArmCommand extends CommandBase {
 
-  /** Creates a new DriveCommand. */
-  public DriveCommand(DriveSubsystem subsystem, XboxController driveController) {
+  public final ArmSubsystem m_armSubsystem;
+  private boolean armState;
+
+  /** Creates a new ArmCommand. */
+  public ArmCommand(ArmSubsystem subsystem, boolean aState) {
     // Use addRequirements() here to declare subsystem dependencies.
-    m_Subsystem = subsystem;
-    m_driveController = driveController;
-    //DriveSubsystem is marked as requirment
+    m_armSubsystem = subsystem;
+    armState = aState;
     addRequirements(subsystem);
   }
 
@@ -28,8 +27,7 @@ public class DriveCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    //DriveSubsystem is called using left-Y and Right-Y as inputs
-    m_Subsystem.tankDrive(-m_driveController.getLeftY() , m_driveController.getRightX());
+    m_armSubsystem.actuateArm(armState);
   }
 
   // Called once the command ends or is interrupted.

@@ -4,21 +4,24 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 
-public class DriveCommand extends CommandBase {
-  public final DriveSubsystem m_Subsystem;
-  public final XboxController m_driveController;
+public class DisabledCommand extends CommandBase {
+  public final DriveSubsystem m_driveSubsystem;
+  public final ShooterSubsystem m_shootSubsystem;
+  public final ArmSubsystem m_armSubsystem;
 
   /** Creates a new DriveCommand. */
-  public DriveCommand(DriveSubsystem subsystem, XboxController driveController) {
+  public DisabledCommand(DriveSubsystem dsubsystem, ShooterSubsystem shsubsystem, ArmSubsystem asubsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
-    m_Subsystem = subsystem;
-    m_driveController = driveController;
+    m_driveSubsystem = dsubsystem;
+    m_shootSubsystem = shsubsystem;
+    m_armSubsystem = asubsystem;
     //DriveSubsystem is marked as requirment
-    addRequirements(subsystem);
+    addRequirements(dsubsystem, shsubsystem, asubsystem);
   }
 
   // Called when the command is initially scheduled.
@@ -28,8 +31,12 @@ public class DriveCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    //DriveSubsystem is called using left-Y and Right-Y as inputs
-    m_Subsystem.tankDrive(-m_driveController.getLeftY() , m_driveController.getRightX());
+    //DriveSubsystem set to 0
+    m_driveSubsystem.tankDrive(0, 0);
+    //set shoot to 0
+
+    //set arm to not do anything
+    
   }
 
   // Called once the command ends or is interrupted.

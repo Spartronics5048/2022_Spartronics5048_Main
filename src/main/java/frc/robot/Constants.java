@@ -13,18 +13,28 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-    
     //Drive CAN Motors
     public static final int rf_drive = 3;
     public static final int rr_drive = 4;
     public static final int lf_drive = 1;
     public static final int lr_drive = 2;
+    //Arm CAN Motor
+    public static final int arm_motor = 5;
+    //Shooter CAN Motor
+    public static final int shooter_motor = 6;
 
     //Xbox Controllers
     public static final int Driver = 0;
-    //public static final int Operator = 1;
+    public static final int Operator = 1;
 
-    //Xbox Controller Axis
-    public static final int Left_Y_axis = 1;
-    public static final int Right_Y_axis = 5;
+    //Dead band values
+	public static final double forwardDeadBand = 0.1;
+	public static final double turnDeadBand = 0.15; 
+
+    //Arm values
+    public static final double armHoldUp = 0.08;
+    public static final double armHoldDown = 0.13;
+    public static final double armTravel = 0.5;
+    public static final double armTimeUp = 0.5;
+    public static final double armTimeDown = 0.35;
 }
