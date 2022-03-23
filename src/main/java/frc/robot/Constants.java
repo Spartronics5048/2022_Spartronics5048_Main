@@ -37,4 +37,8 @@ public final class Constants {
     public static final double armTravel = 0.5;
     public static final double armTimeUp = 0.5;
     public static final double armTimeDown = 0.35;
+
+    //Arm Soft Limit values
+    public static final float maxForward = 10;
+    public static final float maxReverse = 10;
 }

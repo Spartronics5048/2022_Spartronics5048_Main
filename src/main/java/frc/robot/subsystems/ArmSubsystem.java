@@ -24,10 +24,17 @@ public class ArmSubsystem extends SubsystemBase {
     //Create arm motor
     arm_motor = new CANSparkMax(Constants.arm_motor, MotorType.kBrushless);
     arm_motor.restoreFactoryDefaults();
+    //Set Inverted state
     arm_motor.setInverted(false);
+    //Set break on Idle
     arm_motor.setIdleMode(IdleMode.kBrake);
 
-    //arm control code. same as in teleop
+    //Enable Soft Limit
+    arm_motor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
+    arm_motor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
+    //Set Soft Limit
+    arm_motor.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, Constants.maxForward);
+    arm_motor.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, Constants.maxReverse);
   }
 
   public void actuateArm(boolean arm_Up){
@@ -56,8 +63,6 @@ public class ArmSubsystem extends SubsystemBase {
         arm_motor.set(-Constants.armHoldDown);
       }
     }
-
-   
   }
 
   @Override
