@@ -23,6 +23,8 @@ public final class Constants {
     //Shooter CAN Motor
     public static final int shooter_motor = 6;
 
+    /////////////////////////
+
     //Xbox Controllers
     public static final int Driver = 0;
     public static final int Operator = 1;

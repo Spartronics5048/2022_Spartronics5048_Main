@@ -34,9 +34,9 @@ public class DisabledCommand extends CommandBase {
     //DriveSubsystem set to 0
     m_driveSubsystem.tankDrive(0, 0);
     //set shoot to 0
-
+    m_shootSubsystem.actuateShooter(0);
     //set arm to not do anything
-    
+    m_armSubsystem.actuateArm(true);
   }
 
   // Called once the command ends or is interrupted.

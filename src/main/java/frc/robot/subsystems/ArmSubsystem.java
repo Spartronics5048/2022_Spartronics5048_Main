@@ -9,6 +9,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -68,5 +69,21 @@ public class ArmSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+
+    //Pull Buss Voltage for each drive motor
+    double Arm_Voltage = arm_motor.getBusVoltage();
+    //Pull Current for each drive motor
+    double Arm_current = arm_motor.getOutputCurrent();
+    //Pull Applied Output for each drive motor
+    double Arm_appliedOut = arm_motor.getAppliedOutput();
+
+    ////////////////////////////////////////
+
+    //Print Buss Voltage of each drive motor to Smart Dashboard
+    SmartDashboard.putNumber("Right Front Bus Voltage", Arm_Voltage);
+    //Print Current of each drive motor to Smart Dashboard
+    SmartDashboard.putNumber("Right Front Current", Arm_current);
+    //Print Applied Output of each drive motor to Smart Dashboard
+    SmartDashboard.putNumber("Right Front Applied Output", Arm_appliedOut);
   }
 }

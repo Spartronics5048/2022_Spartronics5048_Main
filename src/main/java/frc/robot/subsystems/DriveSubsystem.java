@@ -81,6 +81,12 @@ public void tankDrive(double forwardPower, double turnPower) {
   public void periodic() {
     // This method will be called once per scheduler run
 
+    //Pull Buss Voltage for each drive motor
+    double rf_Voltage = rf_drive.getBusVoltage();
+    double rr_Voltage = rr_drive.getBusVoltage();
+    double lf_Voltage = lf_drive.getBusVoltage();
+    double lr_Voltage = lr_drive.getBusVoltage();
+
     //Pull Current for each drive motor
     double rf_current = rf_drive.getOutputCurrent();
     double rr_current = rr_drive.getOutputCurrent();
@@ -96,6 +102,12 @@ public void tankDrive(double forwardPower, double turnPower) {
     ////////////////////////////////
 
     // Open SmartDashboard when your program is running to see the values
+
+    //Print Buss Voltage of each drive motor to Smart Dashboard
+    SmartDashboard.putNumber("Right Front Bus Voltage", rf_Voltage);
+    SmartDashboard.putNumber("Right Rear  Bus Voltage", rr_Voltage);
+    SmartDashboard.putNumber("Left  Front Bus Voltage", lf_Voltage);
+    SmartDashboard.putNumber("Left  Rear  Bus Voltage", lr_Voltage);
 
     //Print Current of each drive motor to Smart Dashboard
     SmartDashboard.putNumber("Right Front Current", rf_current);
