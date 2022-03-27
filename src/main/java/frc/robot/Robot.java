@@ -4,14 +4,9 @@
 
 package frc.robot;
 
-import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cscore.CvSink;
-import edu.wpi.first.cscore.CvSource;
-import edu.wpi.first.cscore.UsbCamera;
+
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import org.opencv.core.Mat;
+import edu.wpi.first.wpilibj.XboxController;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -20,58 +15,29 @@ import org.opencv.core.Mat;
  * project.
  */
 public class Robot extends TimedRobot {
-  private Command m_autonomousCommand;
-  private Command disabledCommand;
 
-  private RobotContainer m_robotContainer;
-
-  Thread m_visionThread;
+  Thread visionThread;
   
+  final XboxController driveController;
+  final XboxController operatorController;
+  
+  final Drive drive;
+  final Arm arm;
+  final Shooter shooter;
+  final Autonomous auto;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
   @Override
   public void robotInit() {
-    // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
-    // autonomous chooser on the dashboard.
-    m_robotContainer = new RobotContainer();
-    m_visionThread =
-    new Thread(
-        () -> {
-          // Get the UsbCamera from CameraServer
-          UsbCamera camera = CameraServer.startAutomaticCapture();
-          // Set the resolution
-          camera.setResolution(426, 240);
-
-
-
-          // Get a CvSink. This will capture Mats from the camera
-          CvSink cvSink = CameraServer.getVideo();
-          // Setup a CvSource. This will send images back to the Dashboard
-          CvSource outputStream = CameraServer.putVideo("Rectangle", 1, 1);
-
-          // Mats are very memory expensive. Lets reuse this Mat.
-          Mat mat = new Mat();
-
-          // This cannot be 'true'. The program will never exit if it is. This
-          // lets the robot stop this thread when restarting robot code or
-          // deploying.
-          while (!Thread.interrupted()) {
-            // Tell the CvSink to grab a frame from the camera and put it
-            // in the source mat.  If there is an error notify the output.
-            if (cvSink.grabFrame(mat) == 0) {
-              // Send the output the error.
-              outputStream.notifyError(cvSink.getError());
-              // skip the rest of the current iteration
-              continue;
-            }
-            // Give the output stream a new image to display
-            outputStream.putFrame(mat);
-          }
-        });
-      m_visionThread.setDaemon(true);
-      m_visionThread.start();
+	  visionThread = CameraCode.initialize();
+	  visionThread.setDaemon(true);
+      visionThread.start();
+	  
+	  drive = new Drive();
+	  arm = new Arm();
+	  shoot = new Shoot();
   }
 
   /**
@@ -82,20 +48,14 @@ public class Robot extends TimedRobot {
    * SmartDashboard integrated updating.
    */
   @Override
-  public void robotPeriodic() {
-    // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
-    // commands, running already-scheduled commands, removing finished or interrupted commands,
-    // and running subsystem periodic() methods.  This must be called from the robot's periodic
-    // block in order for anything in the Command-based framework to work.
-    CommandScheduler.getInstance().run();
+	public void robotPeriodic() {
    
     }
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
-    disabledCommand = m_robotContainer.getDisabledCommand();
-    disabledCommand.schedule();
+   
   }
 
   @Override
@@ -104,38 +64,49 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-
-    // schedule the autonomous command (example)
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
-    }
+	  auto = new Autonomous(drive, arm, shooter);
   }
 
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+	  auto.periodic();
+  }
 
   @Override
   public void teleopInit() {
-    // This makes sure that the autonomous stops running when
-    // teleop starts running. If you want the autonomous to
-    // continue until interrupted by another command, remove
-    // this line or comment it out.
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
-    }
-
+	  
   }
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+	  //first go through and test for changes that could happen inside of the different subsystems to change values
+	  
+	  //not sure which buttons 6 and 8 are, but Im sure you can figure out the button numbers with a little researching/experimenting
+	  if(operatorController.getRawButtonPressed(6)){
+		 //set arm to go up
+		 arm.setDirection(true);
+	  }else if(operatorController.getRawButtonPressed(8)){
+		  //set arm to go down
+		 arm.setDirection(false);
+	  }
+	
+	  //then run the periodic functions inside of the subsystems
+	  drive.periodic(-driveController.getLeftY(), driveController.getRightX());
+	  arm.periodic();
+	  
+	  //only one trigger at a time, both means nothing happens
+	  if(operatorController.getLeftTriggerAxis() > Constants.intakeDeadBand && operatorController.getRightTriggerAxis() < Constants.intakeDeadBand){
+		  shoot.periodic(-operatorController.getLeftTriggerAxis());
+	  }else if(operatorController.getRightTriggerAxis() > Constants.intakeDeadBand && operatorController.getLeftTriggerAxis() < Constants.intakeDeadBand){
+		  shoot.periodic(operatorController.getRightTriggerAxis());
+	  }
+  }
 
   @Override
   public void testInit() {
-    // Cancels all running commands at the start of test mode.
-    CommandScheduler.getInstance().cancelAll();
+   
   }
 
   /** This function is called periodically during test mode. */

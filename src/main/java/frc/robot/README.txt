@@ -1,0 +1,13 @@
+I have edited the code for simplicity and clarity. The command structure is gone, because in my eyes it is redundant for your robot which has very few pre-automated tasks on board. 
+It makes sense for robots that need a button pushed that then activates a complex series of events that might want to be scheduled. This code has been changed so that most control methods 
+are "periodic" and are triggered by the robot running it's teleop or autonomous periodic methods. Some values being read off of the controllers for buttons may not be correct, but I am sure
+you can gather what I meant and correct any mistakes and set whatever buttons you would like. The autonomous is very similar to the one that you guys had I believe, and I think that the structure is simple enought to see what 
+is going on, and I commented some. I moved the camera code to its own file because it looks better this way, but if it breaks it, then let me know and I will show you how to move it back.
+I added a feature to the arm, so that you cant push the button for up when it is moving down or vice versa. Before you could push the button while it was moving and it would haveswitched direction and messed 
+up the timing of the arm, potentially for the rest of the match. I tried to change the code so that everything is still abstracted away and enables a "command-like" structure, but without 
+the scheduler, and multiple redundant levels of abstraction. An example of this is now there is "drive" which has a method for controlling the drive system that takes values as inputs, these
+could be just numbers for auton or controller values. This is in contrast to designing the subsystem, and then commands for the subsystem, and scheduling commands, and setting default commands
+or mapping button presses. This way the methods of the drive object are the "commands" and they are executed given data from the controller that is read straight from the controller when the 
+method is executed and they are "scheduled" by running in the periodic loops of the robot in Robot.java. In the future if you have a really code heavy robot maybe the command structure would be better, but by then 
+maybe you are writing stuff to run concurrently and making your own (simpler) scheduler. Oh yeah, right now the code works if you just keep all the files in the same folder, if you want to move them you will have to import the moved ones.
+if you have anymore questions or this just doesnt work or something, let me know, I hope this helps.
