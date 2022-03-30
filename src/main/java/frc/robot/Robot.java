@@ -4,9 +4,10 @@
 
 package frc.robot;
 
-
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -17,27 +18,27 @@ import edu.wpi.first.wpilibj.XboxController;
 public class Robot extends TimedRobot {
 
   Thread visionThread;
-  
-  final XboxController driveController;
-  final XboxController operatorController;
-  
-  final Drive drive;
-  final Arm arm;
-  final Shooter shooter;
-  final Autonomous auto;
+
+  //DriveController is defined
+  public XboxController driveController = new XboxController(Constants.Driver);
+  //OperatorController is defined
+  public XboxController operatorController = new XboxController(Constants.Operator);
+
+  // Commands? are defined
+  private final Drive drive = new Drive();
+  private final Arm arm = new Arm();
+  private final Shooter Shooter = new Shooter();
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
   @Override
   public void robotInit() {
-	  visionThread = CameraCode.initialize();
+    // Initalize the Camera Server
+    visionThread = Camera.initialize();
 	  visionThread.setDaemon(true);
       visionThread.start();
-	  
-	  drive = new Drive();
-	  arm = new Arm();
-	  shoot = new Shoot();
   }
 
   /**
@@ -48,15 +49,17 @@ public class Robot extends TimedRobot {
    * SmartDashboard integrated updating.
    */
   @Override
-	public void robotPeriodic() {
-   
-    }
+  public void robotPeriodic() {
+    // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
+    // commands, running already-scheduled commands, removing finished or interrupted commands,
+    // and running subsystem periodic() methods.  This must be called from the robot's periodic
+    // block in order for anything in the Command-based framework to work.
+    CommandScheduler.getInstance().run();
+  }
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {
-   
-  }
+  public void disabledInit() {}
 
   @Override
   public void disabledPeriodic() {}
@@ -64,52 +67,44 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-	  auto = new Autonomous(drive, arm, shooter);
+    // Auto command is defined
+    final Autonomous auton = new Autonomous(drive, arm, Shooter);
   }
 
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {
-	  auto.periodic();
-  }
+  public void autonomousPeriodic() {}
 
   @Override
   public void teleopInit() {
-	  
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-	  //first go through and test for changes that could happen inside of the different subsystems to change values
+    //first go through and test for changes that could happen inside of the different subsystems to change values
 	  
 	  //not sure which buttons 6 and 8 are, but Im sure you can figure out the button numbers with a little researching/experimenting
-	  if(operatorController.getRawButtonPressed(6)){
-		 //set arm to go up
-		 arm.setDirection(true);
-	  }else if(operatorController.getRawButtonPressed(8)){
-		  //set arm to go down
-		 arm.setDirection(false);
-	  }
-	
-	  //then run the periodic functions inside of the subsystems
-	  drive.periodic(-driveController.getLeftY(), driveController.getRightX());
-	  arm.periodic();
-	  
-	  //only one trigger at a time, both means nothing happens
-	  if(operatorController.getLeftTriggerAxis() > Constants.intakeDeadBand && operatorController.getRightTriggerAxis() < Constants.intakeDeadBand){
-		  shoot.periodic(-operatorController.getLeftTriggerAxis());
-	  }else if(operatorController.getRightTriggerAxis() > Constants.intakeDeadBand && operatorController.getLeftTriggerAxis() < Constants.intakeDeadBand){
-		  shoot.periodic(operatorController.getRightTriggerAxis());
-	  }
-  }
+	  /*
+    if(operatorController.getRawButtonPressed(4)){
+      //set arm to go up
+      arm.setDirection(true);
+     }else if(operatorController.getRawButtonPressed(1)){
+       //set arm to go down
+      arm.setDirection(false);
+     }
+     */
 
-  @Override
-  public void testInit() {
-   
+     //then run the periodic functions inside of the subsystems
+     drive.periodic(-driveController.getLeftY(), driveController.getRightX());
+     arm.periodic();
+     
+     //only one trigger at a time, both means nothing happens
+     if(operatorController.getLeftTriggerAxis() > Constants.intakeDeadBand || operatorController.getRightTriggerAxis() == 0){
+       Shooter.periodic(-operatorController.getLeftTriggerAxis());
+     }
+     else if(operatorController.getRightTriggerAxis() > Constants.intakeDeadBand || operatorController.getLeftTriggerAxis() == 0){
+       Shooter.periodic(operatorController.getRightTriggerAxis());
+     }
   }
-
-  /** This function is called periodically during test mode. */
-  @Override
-  public void testPeriodic() {}
 }

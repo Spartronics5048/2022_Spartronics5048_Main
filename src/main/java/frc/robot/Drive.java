@@ -1,10 +1,14 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package frc.robot;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-
 
 public class Drive{
 	private CANSparkMax rf_drive, rr_drive, lf_drive, lr_drive;
@@ -62,8 +66,8 @@ public class Drive{
 			//take the current values of the motors and add the turn value to them, and then set that as the new values
 			//we could have done this with forward power too, but since the value is just 0 to start always, there is no point
 			//in taking the current value of the motors.
-			rightPower = rightPower + turnPower;
-			leftPower = leftPower - turnPower;
+			rightPower = rightPower - turnPower;
+			leftPower = leftPower + turnPower;
 		}
 		//else do nothing
 	

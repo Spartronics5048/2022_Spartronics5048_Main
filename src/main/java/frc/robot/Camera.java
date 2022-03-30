@@ -1,19 +1,23 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package frc.robot;
+
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.cscore.UsbCamera;
 import org.opencv.core.Mat;
 
-public class CameraCode{
-	public static Thread initialize(){
+public class Camera {
+    public static Thread initialize(){
 		return new Thread(
         () -> {
           // Get the UsbCamera from CameraServer
           UsbCamera camera = CameraServer.startAutomaticCapture();
           // Set the resolution
           camera.setResolution(426, 240);
-
-
 
           // Get a CvSink. This will capture Mats from the camera
           CvSink cvSink = CameraServer.getVideo();

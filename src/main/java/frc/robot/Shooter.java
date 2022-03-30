@@ -1,19 +1,31 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package frc.robot;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 
-public class Shoot{
-	private CANSparkMax intake;
-	private power;
-	public Shoot(){
-		intake = new CANSparkMax(Constants.shooter_motor, MotorType.kBrushed);
-		intake.restoreFactoryDefaults();
-		intake.setInverted(false);
+public class Shooter{
+	private CANSparkMax m_intake;
+	public Shooter(){
+		m_intake = new CANSparkMax(Constants.shooter_motor, MotorType.kBrushed);
+		m_intake.restoreFactoryDefaults();
+		m_intake.setInverted(false);
 	}
 	
-	periodic(power){
-		intake.set(power);
+	void periodic(double power){
+		double outpower = 0;
+		if (power < Constants.intakeDeadBand){
+			outpower = 0;
+		}
+		else if (power > Constants.intakeDeadBand){
+			outpower = power;
+		}
+		m_intake.set(outpower);
 	}
 	
 	void UpdateData(){
