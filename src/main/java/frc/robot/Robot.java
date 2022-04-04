@@ -42,6 +42,7 @@ public class Robot extends TimedRobot {
     visionThread = Camera.initialize();
 	  visionThread.setDaemon(true);
     visionThread.start();
+    // Initalize arm
     arm.armInit();
   }
 

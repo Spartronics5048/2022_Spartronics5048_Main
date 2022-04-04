@@ -33,7 +33,6 @@ public class Autonomous{
 	
 	//Disabled Code
 	//Does not have code to move arm
-
 	void spitBallandTurnAround(double elapsedTime){
 		//System.out.println("E Time: " + elapsedTime);
 		if(elapsedTime < 1.5){	//for the first 1.5 seconds.....

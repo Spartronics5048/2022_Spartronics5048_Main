@@ -31,31 +31,31 @@ public class Arm{
 		arm_motor.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, Constants.maxForward);
 		arm_motor.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, Constants.maxReverse);
 
+		//Start armInit
 		armInit();
 	}
 
 	public void armInit() {
-		arm_motor.getEncoder().setPosition(75);
+		arm_motor.getEncoder().setPosition(75); //Set startup Position
 
-		arm_motor.getPIDController().setP(0.2);
+		arm_motor.getPIDController().setP(0.2); // No idea what any of these 3 do
 		arm_motor.getPIDController().setI(0);
 		arm_motor.getPIDController().setD(0.5);
-		arm_motor.getPIDController().setFeedbackDevice(arm_motor.getEncoder());
-		arm_motor.setClosedLoopRampRate(0.4);
+		arm_motor.getPIDController().setFeedbackDevice(arm_motor.getEncoder()); //Get encoder feedback
+		arm_motor.setClosedLoopRampRate(0.4); //Speed of PID , too high and it overshoots and undershoots as it gets to it's assigned position
 	}
 
 	public void armEncZero() {
-		arm_motor.getEncoder().setPosition(0);
+		arm_motor.getEncoder().setPosition(0); //Go to position 0 , down
 	}
 
 	public void setPercentOut(double speed){
-		arm_motor.set(0);
+		arm_motor.set(0); //Set speed to 0?
 	}
 	public void setPIDDirection(Double position){
-		System.out.print(position);
-		arm_motor.getPIDController().setReference(position, ControlType.kPosition);
+		//System.out.print(position);
+		arm_motor.getPIDController().setReference(position, ControlType.kPosition); //set direction of motor
 	}
-
 
 	public void setDirection(boolean arm_Up){
 		if(arm_Up && !armUp && !moving){
@@ -69,6 +69,7 @@ public class Arm{
 		}  
 	}
   
+//below is deactivated code
   public void periodic() {
 	  //actuateArm();
 	  //UpdateData();
