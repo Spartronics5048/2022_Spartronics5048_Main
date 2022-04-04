@@ -19,6 +19,8 @@ public class Shooter {
 		m_intake.restoreFactoryDefaults();
 	}
 
+	//Add code for button to shoot at 100% and trigger to suck-in at varied rate
+
 	void periodic(double leftPower, double rightPower, XboxController controller) {
 		double speed = 0;
 		if (leftPower > 0.1){
@@ -26,9 +28,7 @@ public class Shooter {
 		} else if (rightPower > 0.1){
 			speed = rightPower;
 		}
-
 		m_intake.set(speed);
-		
 	}
 
 	void UpdateData() {

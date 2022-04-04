@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Arm{
 	private CANSparkMax arm_motor;
 	private boolean armUp = true; //Arm initialized to up because that's how it would start a match
-	private double lastBurstTime = 0;
+	private double lastBurstTime = 0; //States as unnecessary but is
 	private boolean moving; //indicates if the arm is currently moving, we dont want to switch directions while it is moving else potentialy messing up the timing and the robot wont know where the arm is
 	public Arm(){
 		//Create arm motor
