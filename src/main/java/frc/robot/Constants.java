@@ -29,18 +29,21 @@ public final class Constants {
     public static final int Driver = 0;
     public static final int Operator = 1;
 
-    //Dead band values
+    //Drive Dead band
 	public static final double forwardDeadBand = 0.1;
 	public static final double turnDeadBand = 0.15; 
+
+    //Intake Dead Band
+    public static final double intakeDeadBand = 0.1;
 
     //Arm values
     public static final double armHoldUp = 0.08;
     public static final double armHoldDown = 0.13;
-    public static final double armTravel = 0.5;
+    public static final double armTravel = 0.8;
     public static final double armTimeUp = 0.5;
     public static final double armTimeDown = 0.35;
 
     //Arm Soft Limit values
-    public static final float maxForward = 10;
-    public static final float maxReverse = 10;
+    public static final float maxForward = 80;
+    public static final float maxReverse = 5;
 }
